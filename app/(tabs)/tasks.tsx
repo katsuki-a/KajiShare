@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
-import { StyleSheet, FlatList } from 'react-native';
+import { StyleSheet, FlatList, SafeAreaView, StatusBar, Platform, TouchableOpacity } from 'react-native';
+import { router } from 'expo-router';
 import { ThemedView } from '@/components/ThemedView';
 import { ThemedText } from '@/components/ThemedText';
 import { TaskItem, Task } from '@/components/TaskItem';
+import { IconSymbol } from '@/components/ui/IconSymbol';
 
 // サンプルデータ
 const initialTasks: Task[] = [
@@ -37,26 +39,63 @@ export default function TasksScreen() {
     ));
   };
 
+  const handleAddTask = () => {
+    router.push('/modal/add-task');
+  };
+
   return (
-    <ThemedView style={styles.container}>
-      <ThemedText type="title" style={styles.title}>家事分担</ThemedText>
-      <FlatList
-        data={tasks}
-        renderItem={({ item }) => (
-          <TaskItem task={item} onPress={handleTaskPress} />
-        )}
-        keyExtractor={item => item.id}
+    <SafeAreaView style={styles.safeArea}>
+      <StatusBar
+        barStyle="dark-content"
+        backgroundColor="transparent"
+        translucent
       />
-    </ThemedView>
+      <ThemedView style={styles.container}>
+        <ThemedView style={styles.header}>
+          <ThemedText type="title" style={styles.title}>家事分担</ThemedText>
+          <TouchableOpacity 
+            style={styles.addButton}
+            onPress={handleAddTask}
+          >
+            <IconSymbol size={24} name="plus.circle.fill" color="#007AFF" />
+          </TouchableOpacity>
+        </ThemedView>
+        <FlatList
+          data={tasks}
+          renderItem={({ item }) => (
+            <TaskItem task={item} onPress={handleTaskPress} />
+          )}
+          keyExtractor={item => item.id}
+          contentContainerStyle={styles.listContent}
+        />
+      </ThemedView>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
+  safeArea: {
+    flex: 1,
+    backgroundColor: '#fff',
+  },
   container: {
     flex: 1,
     padding: 16,
+    paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight : 0,
+  },
+  header: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 16,
   },
   title: {
-    marginBottom: 16,
+    marginBottom: 0,
+  },
+  addButton: {
+    padding: 8,
+  },
+  listContent: {
+    paddingBottom: 16,
   },
 }); 
